@@ -1,0 +1,82 @@
+/* Palette: background #f2f2f2 · text #091413 · secondary #285a48 · point #408a71 */
+:root {
+  --paper: #f2f2f2;
+  --paper-deep: #e6e6e6;
+  --ink: #091413;
+  --ink-soft: #285a48;
+  --ink-faint: #4f5a55;
+  --line: rgba(9, 20, 19, 0.18);
+  --lime: #408a71;
+  --cobalt: #285a48;
+  --surface: #fbfbfb;
+  --on-dark: 242, 242, 242;
+}
+
+::selection { background: var(--lime); color: #fff; }
+
+.site-header--scrolled { background: rgba(242, 242, 242, .92); }
+
+/* Hero visual: placeholder panel until a new image replaces index_files/hero.png */
+.hero__visual { background: var(--paper-deep); }
+.hero__visual::before { background: linear-gradient(90deg, var(--paper) 0%, rgba(242,242,242,.6) 12%, transparent 34%); }
+.hero__visual-tag { color: #fff; }
+
+/* VIEW WORK: a clear, solid button below the intro text */
+.hero__foot { flex-direction: column; align-items: flex-start; gap: 26px; }
+.round-cta {
+  position: relative;
+  z-index: 3;
+  width: auto;
+  height: auto;
+  padding: 15px 22px 15px 26px;
+  gap: 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font: 600 13px/1 var(--display);
+  letter-spacing: .1em;
+  box-shadow: 0 6px 0 var(--lime);
+  cursor: pointer;
+  transition: background .2s, transform .2s, box-shadow .2s;
+}
+.round-cta br { display: none; }
+.round-cta svg { color: #fff; }
+.round-cta:hover { background: var(--ink-soft); transform: translateY(-2px); box-shadow: 0 8px 0 var(--lime); }
+.round-cta:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--lime); }
+.round-cta:focus-visible { outline: 3px solid var(--lime); outline-offset: 4px; }
+
+/* Dark bands (capabilities, contact) */
+.capabilities__intro { border-bottom-color: rgba(var(--on-dark), .24); }
+.capabilities__intro p { color: rgba(var(--on-dark), .78); }
+.capability { border-right-color: rgba(var(--on-dark), .24); }
+.capability, .capability + .capability { border-bottom-color: rgba(var(--on-dark), .24); }
+.capability__label { color: rgba(var(--on-dark), .66); }
+.capability p { color: rgba(var(--on-dark), .74); }
+.contact__rail { border-color: rgba(var(--on-dark), .25); }
+.contact__rail .rail__label { color: rgba(var(--on-dark), .7); }
+.copy-button { border-color: rgba(var(--on-dark), .65); }
+.contact__footer { border-top-color: rgba(var(--on-dark), .3); }
+
+/* Project cards */
+.project:hover { background: rgba(64,138,113,.08); }
+.project__artifact { background: var(--surface); }
+.project:hover .project__artifact { box-shadow: 7px 8px 0 rgba(9,20,19,.14); }
+.artifact__bar { border-bottom-color: var(--line); }
+.artifact__legend { border-top-color: var(--line); }
+.artifact__canvas { background-image: linear-gradient(rgba(9,20,19,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(9,20,19,.08) 1px, transparent 1px); }
+.artifact__node { box-shadow: 0 0 0 3px var(--surface), 0 0 0 4px var(--ink); }
+.artifact__panel { border-color: rgba(9,20,19,.45); background: rgba(242,242,242,.65); }
+.project--ink .artifact__canvas { background-color: #ececec; }
+.project--lime .project__details li svg { color: var(--lime); }
+
+/* Play log link box */
+.playlog-cta a { background: var(--surface); }
+.playlog-cta a:hover { background: var(--lime); color: #fff; }
+.playlog-cta a:hover small, .playlog-cta a:hover .playlog-cta__label { color: #fff; }
+.playlog-cta small { color: var(--ink-soft); }
+
+@media (max-width: 680px) {
+  .hero { height: auto; min-height: 0; padding-bottom: calc(255px + 40px); }
+  .hero__visual::before { background: linear-gradient(180deg, var(--paper) 0%, rgba(242,242,242,.45) 30%, transparent 70%); }
+}
