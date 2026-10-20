@@ -276,6 +276,10 @@
     });
   }, { threshold: 0.45 });
   $$('.panel').forEach((p) => panelObserver.observe(p));
+  const liveObserver = new IntersectionObserver((entries) => {
+    entries.forEach((en) => en.target.classList.toggle('live', en.isIntersecting));
+  }, { rootMargin: '120px 0px' });
+  $$('.panel').forEach((p) => liveObserver.observe(p));
 
   /* ------------------------------------------------ draggable collage */
   const collage = $('#collage');
