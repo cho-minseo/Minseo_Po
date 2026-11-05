@@ -4,4 +4,5 @@
 
 - 메인: `index.html` (히어로 UI 흐름도, 프로젝트 6개, 소개 콜라주)
 - 게임 플레이 이력: `game-history.html`
+- 게임 분석 보고서: `reports.html`, `reports/`
 - 이전 버전: `legacy-v1` 브랜치

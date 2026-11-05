@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.to-list{max-width:860px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));font-size:14px}.to-list a{color:inherit;text-underline-offset:3px}</style>
+<title>니케 순위 급등 분석</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 답을 먼저 쓰는 분석 보고서: 흰 바탕, 빨강은 핵심 수치에만, 숫자는 좁은 글꼴 */
+:root {
+  --bg: #ffffff; --fg: #191919; --muted: #62605c; --rule: #dcdad6; --panel: #f4f3f1; --accent: #cc0000; --line2: #8c8a86;
+  --body: "IBM Plex Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  --num: "Barlow Condensed", "IBM Plex Sans KR", "Malgun Gothic", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #171614; --fg: #f1efeb; --muted: #aaa7a1; --rule: #3a3835; --panel: #23211f; --accent: #ff6b5e; --line2: #8f8c86; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #171614; --fg: #f1efeb; --muted: #aaa7a1; --rule: #3a3835; --panel: #23211f; --accent: #ff6b5e; --line2: #8f8c86; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.7; word-break: keep-all; overflow-wrap: anywhere }
+.page { max-width: 860px; margin: 0 auto; padding-block: 48px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 44px }
+.page > * { min-width: 0 }
+header { display: grid; gap: 12px }
+.eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--accent) }
+h1 { margin: 0; font-size: clamp(28px, 5vw, 40px); line-height: 1.3; font-weight: 700; text-wrap: balance }
+.meta { font-size: 14px; color: var(--muted) }
+h2 { margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px solid var(--fg); font-size: 21px; line-height: 1.45; font-weight: 700; text-wrap: balance }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px }
+.answer { background: var(--panel); padding: 22px 24px; display: grid; gap: 12px }
+.answer p { margin: 0; font-size: 18px; font-weight: 500; line-height: 1.6 }
+.path { display: flex; flex-wrap: wrap; gap: 8px 28px; font-family: var(--num); font-weight: 600; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums }
+.path span { display: grid; gap: 2px }
+.path small { font-family: var(--body); font-size: 13px; font-weight: 400; color: var(--muted) }
+.path .hit { color: var(--accent) }
+figure { margin: 0; display: grid; gap: 10px }
+figcaption, .cap { font-size: 13.5px; color: var(--muted); line-height: 1.55 }
+svg { width: 100%; height: auto; display: block }
+svg text { font-family: var(--num); fill: var(--fg); font-size: 17px; font-weight: 600 }
+svg .axis { fill: var(--muted); font-size: 15px; font-weight: 500 }
+svg .note { fill: var(--muted); font-family: var(--body); font-size: 13px; font-weight: 400 }
+svg .hit { fill: var(--accent) }
+.scroll { overflow-x: auto }
+table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14.5px; line-height: 1.55 }
+th { text-align: left; font-weight: 700; padding: 8px 10px 8px 0; border-bottom: 2px solid var(--fg); white-space: nowrap }
+td { padding: 10px 10px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: top }
+td:first-child { font-weight: 700; white-space: nowrap }
+.src { color: var(--muted); font-size: 13px; white-space: nowrap }
+ol.sources { margin: 0; padding-left: 26px; display: grid; gap: 6px; font-size: 14px; color: var(--muted) }
+a { color: inherit; text-underline-offset: 2px }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+/* 인터랙션: 조작 도구는 각진 버튼으로 통일, 눌린 상태는 글자색 반전 */
+button { font: inherit; color: inherit; background: none; border: 1px solid var(--rule); border-radius: 0; cursor: pointer }
+button:hover { border-color: var(--fg) }
+button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg) }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between }
+.seg { display: flex; gap: 8px; flex-wrap: wrap }
+.tools button { min-height: 40px; padding: 4px 14px; font-size: 14px; font-weight: 500 }
+.readout { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 16px; align-items: center; background: var(--panel); padding: 12px 16px }
+.ro-rank { font-family: var(--num); font-weight: 600; font-size: 46px; line-height: 1; font-variant-numeric: tabular-nums }
+.ro-rank.hit { color: var(--accent) }
+.ro-text { min-width: 0; min-height: 5.6em; display: grid; align-content: center; gap: 2px; font-size: 14.5px; line-height: 1.5 }
+.ro-delta { color: var(--muted); font-size: 13.5px }
+.ro-text strong { font-weight: 700 }
+#chart { touch-action: pan-y; cursor: crosshair }
+#chart .halo { paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round }
+.chips { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px }
+.chips button { display: grid; gap: 0; padding: 6px 4px; text-align: center; font-size: 13px; line-height: 1.3 }
+.chips b { font-family: var(--num); font-size: 21px; font-weight: 600; font-variant-numeric: tabular-nums }
+.formula { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; font-family: var(--num); font-size: 22px; font-weight: 600 }
+.formula button { min-height: 42px; padding: 2px 14px; font-family: var(--body); font-size: 15px; font-weight: 500 }
+.formula small { font-family: var(--num); font-size: 15px; font-weight: 500; opacity: .75 }
+#fAll { margin-left: auto }
+.fstatus { margin: 0 0 10px }
+tbody tr.in { animation: rowin .28s ease-out }
+@keyframes rowin { from { opacity: .15 } }
+.cite { border: 0; padding: 0 1px; color: var(--muted); font-size: .92em; text-decoration: underline dotted; text-underline-offset: 3px }
+.cite:hover { color: var(--accent) }
+.cite[aria-expanded="true"] { color: var(--accent); font-weight: 700 }
+.srcbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--fg); color: var(--bg); padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.srcbar-in { max-width: 828px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; font-size: 14px; line-height: 1.5 }
+.srcbar-in span { flex: 1 1 280px; min-width: 0 }
+.srcbar a { font-weight: 700 }
+.srcbar button { padding: 4px 12px; min-height: 36px; border-color: currentColor }
+@media (max-width: 560px) {
+  .chips { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .readout { grid-template-columns: 76px minmax(0, 1fr); gap: 10px }
+  .ro-rank { font-size: 38px }
+  #fAll { margin-left: 0 }
+}
+@media (prefers-reduced-motion: reduce) { tbody tr.in { animation: none } }
+</style>
+</head>
+<body>
+<div class="to-list"><a href="../reports.html">← 게임 분석 보고서 목록</a></div>
+<main class="page">
+  <header>
+    <div class="eyebrow">시장 데이터 분석 보고서</div>
+    <h1>니케는 왜 35위에서 5위로 올랐나</h1>
+    <div class="meta">조민서 · 유한대학교 게임콘텐츠전공 · 2026.11.05 · Claude Code 활용 작성</div>
+  </header>
+
+  <section class="answer" aria-label="결론">
+    <p>4주년 업데이트(10/29)가 순위 급등의 가장 유력한 원인임. 신규 캐릭터 픽업이 결제를 만들고, 대규모 무료 혜택이 복귀 유저를 불러왔으며, 11/5 2차 픽업이 상승세를 이어 가는 구조임.</p>
+    <div class="path" aria-label="구글플레이 매출 순위 변화">
+      <span>35위<small>10/29 오전 기록</small></span>
+      <span class="hit">3위<small>11/2 최고 기록</small></span>
+      <span>5위<small>11/5 과제 기준</small></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>35위는 업데이트 직전 저점이었고, 순위는 나흘 만에 3위까지 오름</h2>
+    <figure>
+      <div class="tools">
+        <div class="seg" role="group" aria-label="그래프 기간">
+          <button type="button" id="rangeFull" aria-pressed="true">전체 기간</button>
+          <button type="button" id="rangeZoom" aria-pressed="false">4주년 전후</button>
+        </div>
+        <button type="button" id="replay">▶ 순위 변화 재생</button>
+      </div>
+      <div class="readout" id="readout" aria-live="polite">
+        <div class="ro-rank hit" id="roRank">5위</div>
+        <div class="ro-text"><strong id="roDate">11/5</strong><span id="roNote">과제 문구 기준임.</span><span class="ro-delta" id="roDelta"></span></div>
+      </div>
+      <svg id="chart" viewBox="0 0 740 320" role="img" aria-label="구글플레이 매출 순위 선 그래프. 9월 3일 16위, 9월 17일 34위, 10월 1일 15위, 10월 29일 35위, 11월 2일 3위, 11월 5일 5위.">
+        <line x1="612" y1="16" x2="612" y2="276" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="5 5"/>
+        <text class="note" x="602" y="28" text-anchor="end">10/29 4주년 업데이트</text>
+        <line x1="40" y1="276" x2="700" y2="276" stroke="var(--rule)"/>
+        <polyline fill="none" stroke="var(--line2)" stroke-width="2.5" points="40,122 182,233 324,116 609,239"/>
+        <polyline fill="none" stroke="var(--accent)" stroke-width="3" points="609,239 650,42 680,55"/>
+        <g fill="var(--line2)"><circle cx="40" cy="122" r="5"/><circle cx="182" cy="233" r="5"/><circle cx="324" cy="116" r="5"/></g>
+        <g fill="var(--accent)"><circle cx="609" cy="239" r="5.5"/><circle cx="650" cy="42" r="5.5"/><circle cx="680" cy="55" r="5.5"/></g>
+        <text x="40" y="108" text-anchor="middle">16위</text>
+        <text x="182" y="258" text-anchor="middle">34위</text>
+        <text x="324" y="102" text-anchor="middle">15위</text>
+        <text x="594" y="262" text-anchor="end">35위</text>
+        <text class="hit" x="640" y="46" text-anchor="end">3위</text>
+        <text class="hit" x="692" y="60">5위</text>
+        <g class="axis" text-anchor="middle">
+          <text class="axis" x="40" y="302">9/3</text><text class="axis" x="182" y="302">9/17</text><text class="axis" x="324" y="302">10/1</text><text class="axis" x="600" y="302">10/29</text><text class="axis" x="648" y="302">11/2</text><text class="axis" x="692" y="302">11/5</text>
+        </g>
+      </svg>
+      <div class="chips" id="chips" role="group" aria-label="기록 날짜 선택"></div>
+      <figcaption>그림 1. 한국 구글플레이 매출 순위 변화 (위로 갈수록 상위). 9/3~10/29는 모바일인덱스 수기 기록[1], 11/2는 지디넷코리아[2], 11/5는 과제 문구 기준임. 선은 기록을 이은 것이며 기록 사이의 실제 순위가 아님. 점이나 날짜를 누르면 해당 기록이 표시됨.</figcaption>
+    </figure>
+    <ul style="margin-top:14px">
+      <li>10/29 기록은 오전 9시경 작성됨 → 업데이트 효과가 반영되기 전 수치로 추정함</li>
+      <li>같은 날 한국 앱스토어는 매출 1위에 오름[3] → 10/29 오전 앱스토어 47위권 밖에서 하루 안에 정상 도달[1][3]</li>
+      <li>주간 집계(10/26~11/1)에서도 구글플레이 매출 4위를 기록함[4]</li>
+      <li>9~10월 15위권과 35위권을 오간 등락의 원인은 이번 조사에서 확인하지 못함</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>업데이트의 각 요소가 매출의 세 변수를 동시에 움직임</h2>
+    <div class="formula" role="group" aria-label="매출 변수로 표 1 거르기">
+      <span>매출 =</span>
+      <button type="button" id="fDAU" data-f="DAU" aria-pressed="false">DAU <small></small></button>
+      <span>×</span>
+      <button type="button" id="fPay" data-f="결제율" aria-pressed="false">결제율 <small></small></button>
+      <span>×</span>
+      <button type="button" id="fArppu" data-f="ARPPU" aria-pressed="false">ARPPU <small></small></button>
+      <button type="button" id="fAll" data-f="" aria-pressed="true">전체 보기</button>
+    </div>
+    <p class="cap fstatus" id="fStatus" aria-live="polite">변수를 누르면 그 변수를 움직인 요소만 표에 남음.</p>
+    <div class="scroll">
+      <table id="t1">
+        <caption class="cap" style="caption-side:bottom;text-align:left;padding-top:10px">표 1. 4주년 업데이트 구성과 매출 변수 연결. 매출 = DAU × 결제율 × ARPPU. 변수 연결은 작성자 해석임.</caption>
+        <thead><tr><th>구성 요소</th><th>내용</th><th>움직이는 변수</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr data-var="결제율"><td>신규 픽업</td><td>필그림 '마리안: 퀸'(10/29~11/19), '홍련: 신살'(11/5~11/26) 특수 모집</td><td>결제율: 한정 기간 안에 뽑으려는 수요</td><td class="src">[3][5][6]</td></tr>
+          <tr data-var="DAU"><td>메인 스토리</td><td>49·50챕터, 제3차 지상 탈환 작전, 풀 보이스 이벤트 'MARIA-n'</td><td>DAU: 기존 유저와 이탈 유저가 돌아올 이유</td><td class="src">[2][3][7]</td></tr>
+          <tr data-var="DAU"><td>무료 혜택</td><td>무료 모집 최대 230회, 매일 무료 모집, SSR '라푼젤: 생츄어리' 무료 지급</td><td>DAU: 접속 동기. 무료로 뽑다가 결제로 이어질 가능성</td><td class="src">[3][5]</td></tr>
+          <tr data-var="DAU"><td>복귀 지원</td><td>24일 이상 미접속 유저에게 모집권과 성장 재화 지급, 스토리 모드 난도 완화</td><td>DAU: 복귀 진입 장벽 감소</td><td class="src">[5]</td></tr>
+          <tr data-var="ARPPU"><td>한정 코스튬</td><td>신규 한정 코스튬 4종</td><td>ARPPU: 능력과 무관한 치장 소비</td><td class="src">[3]</td></tr>
+          <tr data-var="DAU"><td>오프라인 홍보</td><td>도쿄 롯폰기역 전시, 아키하바라·신주쿠·시부야 광고</td><td>DAU: 일본 시장 관심 환기</td><td class="src">[7]</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>이번 상승은 주요 업데이트마다 반복된 패턴임</h2>
+    <div class="scroll">
+      <table>
+        <caption class="cap" style="caption-side:bottom;text-align:left;padding-top:10px">표 2. 주요 업데이트 시기의 매출 순위 기록.</caption>
+        <thead><tr><th>시기</th><th>기록</th><th>근거</th></tr></thead>
+        <tbody>
+          <tr><td>2025.11 3주년</td><td>국내 한때 매출 1위, 일본 앱스토어 2위, 북미 22위</td><td class="src">[2]</td></tr>
+          <tr><td>2026.04 3.5주년</td><td>일본 구글플레이 매출 1위</td><td class="src">[7]</td></tr>
+          <tr><td>2026.07 여름 업데이트</td><td>일본 구글플레이 매출 1위</td><td class="src">[7]</td></tr>
+          <tr><td>2026.10 4주년</td><td>한국·대만 앱스토어 매출 1위, 일본 구글플레이 1위(4개월 만), 한국 구글플레이 3위</td><td class="src">[2][7]</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul style="margin-top:14px">
+      <li>평소 순위가 낮아도 큰 업데이트 때 정상권으로 복귀함 → 픽업 주기에 매출이 몰리는 구조로 해석함</li>
+      <li>11/5 '홍련: 신살' 픽업 당일 올라온 성능 후기 영상은 약 6시간 만에 조회수 약 9.8만 회를 기록함 → 2차 픽업 관심이 높다는 신호임[9]</li>
+      <li>영상 제목이 '고점의 니케'로 성능을 강조함 → 이번 수요에는 성능이 뽑는 이유로 작용한 것으로 보임[9]</li>
+      <li>다음 변수는 11/6~19 성수 팝업스토어, 12/4~6 AGF 2026임[7]</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>이 분석의 한계</h2>
+    <ul>
+      <li>원인은 시점 일치와 언론 분석을 근거로 한 추정임. 실제 매출액과 유저 수는 공개 자료에서 찾지 못함</li>
+      <li>11/5 5위는 과제 문구를 따름. 스토어와 시각을 별도로 확인하지 못해 구글플레이 기준으로 가정함</li>
+      <li>요소별 기여도는 분리할 수 없음. 표 1의 변수 연결은 인과 측정값이 아님</li>
+      <li>무료 모집 횟수는 매체마다 다름: 최대 230회[5], 최대 259회[8]</li>
+      <li>경쟁작의 순위 변동이 니케 순위에 준 영향은 반영하지 못함</li>
+      <li>영상[9]은 자막을 확인하지 못해 제목과 조회수(11/5 13시경)만 사용함. 한 채널의 관심 지표라 전체 수요를 대표하지는 않음</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>출처</h2>
+    <ol class="sources">
+      <li>모바일인덱스 실시간 순위 수기 기록 (2026.09.03, 09.17, 10.01, 10.29)</li>
+      <li><a href="https://zdnet.co.kr/view/?no=20261102094333">지디넷코리아, '승리의 여신: 니케', 4주년 효과로 매출 순위 급등 (2026.11.02)</a></li>
+      <li><a href="https://zdnet.co.kr/view/?no=20261029174322">지디넷코리아, 4주년 업데이트 직후 국내 앱스토어 매출 1위 기록 (2026.10.29)</a></li>
+      <li><a href="https://www.betanews.net/article/view/beta202611020005">베타뉴스, [주간 모바일 순위] 4주년 승리의 여신: 니케 (2026.11.02)</a></li>
+      <li><a href="https://www.invenglobal.com/articles/27864/up-to-230-free-pulls-and-a-unit-beyond-welfare-standards-the-4th-anniversary-is-the-perfect-time-to-start-or-return">Inven Global, Up to 230 Free Pulls (2026.10.28)</a></li>
+      <li><a href="https://www.xportsnews.com/article/2212863">엑스포츠뉴스, 니케 4주년 업데이트 기사 (2026.10)</a></li>
+      <li><a href="https://www.playforum.net/news/articleView.html?idxno=635749">플레이포럼, 공식이 된 역주행 (2026.11.02)</a></li>
+      <li><a href="https://playday.one/2026/10/30/goddess-of-victory-nikke-major-4th-anni-update-now-live-up-to-259-free-pulls/">PlayDay, NIKKE 4th Anni Update Now Live (2026.10.30)</a></li>
+      <li><a href="https://youtu.be/wrUzxCNCuMk">유튜브 고뇨, [승리의 여신: 니케] 홍련:신살 성능 후기 (2026.11.05 업로드, 조회수 97,968회 기준)</a></li>
+    </ol>
+  </section>
+</main>
+
+<aside class="srcbar" id="srcbar" hidden aria-label="출처 보기">
+  <div class="srcbar-in">
+    <span id="srcText"></span>
+    <a id="srcLink" href="#" target="_blank" rel="noopener">원문 열기</a>
+    <button type="button" id="srcClose">닫기</button>
+  </div>
+</aside>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  const day = (m, d) => Date.UTC(2026, m - 1, d) / 864e5;
+
+  /* ---------- 출처 표시 ---------- */
+  const citeHTML = text => text.replace(/\[(\d)\]/g, '<button type="button" class="cite" data-n="$1" aria-expanded="false" aria-controls="srcbar">[$1]</button>');
+  const sources = [...document.querySelectorAll('.sources li')];
+  const walker = document.createTreeWalker(document.querySelector('main'), NodeFilter.SHOW_TEXT, {
+    acceptNode: n => n.parentElement.closest('.sources, svg, #readout') ? NodeFilter.FILTER_REJECT
+      : /\[\d\]/.test(n.data) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    const t = document.createElement('template');
+    t.innerHTML = citeHTML(n.data.replace(/&/g, '&amp;').replace(/</g, '&lt;'));
+    n.replaceWith(t.content);
+  });
+
+  const bar = $('srcbar');
+  let openCite = null;
+  const closeSource = () => {
+    bar.hidden = true;
+    if (openCite) openCite.setAttribute('aria-expanded', 'false');
+    openCite = null;
+  };
+  document.addEventListener('click', e => {
+    const c = e.target.closest('.cite');
+    if (!c) return;
+    const same = c === openCite;
+    closeSource();
+    if (same) return;
+    const li = sources[c.dataset.n - 1];
+    const a = li.querySelector('a');
+    $('srcText').textContent = `[${c.dataset.n}] ${li.textContent}`;
+    $('srcLink').hidden = !a;
+    if (a) $('srcLink').href = a.href;
+    bar.hidden = false;
+    c.setAttribute('aria-expanded', 'true');
+    openCite = c;
+  });
+  $('srcClose').addEventListener('click', closeSource);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSource(); });
+
+  /* ---------- 표 1 변수 필터 ---------- */
+  const rows = [...document.querySelectorAll('#t1 tbody tr')];
+  const fButtons = [...document.querySelectorAll('.formula button')];
+  fButtons.forEach(b => {
+    const small = b.querySelector('small');
+    if (small) small.textContent = rows.filter(r => r.dataset.var === b.dataset.f).length;
+    b.addEventListener('click', () => {
+      const f = b.dataset.f;
+      fButtons.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      let count = 0;
+      rows.forEach(r => {
+        const on = !f || r.dataset.var === f;
+        r.hidden = !on;
+        r.classList.remove('in');
+        if (on) { count++; void r.offsetWidth; r.classList.add('in'); }
+      });
+      $('fStatus').textContent = f ? `${f} 변수를 움직인 요소 ${count}개를 표시함.` : '변수를 누르면 그 변수를 움직인 요소만 표에 남음.';
+    });
+  });
+
+  /* ---------- 그림 1 순위 그래프 ---------- */
+  const UPDATE = day(10, 29), PICKUP = day(11, 5);
+  const data = [
+    { id: 'a', label: '9/3', t: day(9, 3), rank: 16, note: '모바일인덱스 수기 기록임.[1]', dx: 0, dy: -13, anchor: 'middle' },
+    { id: 'b', label: '9/17', t: day(9, 17), rank: 34, note: '모바일인덱스 수기 기록임. 등락 원인은 이번 조사에서 확인하지 못함.[1]', dx: 0, dy: 25, anchor: 'middle' },
+    { id: 'c', label: '10/1', t: day(10, 1), rank: 15, note: '모바일인덱스 수기 기록임. 등락 원인은 이번 조사에서 확인하지 못함.[1]', dx: 0, dy: -13, anchor: 'middle' },
+    { id: 'd', label: '10/29', t: UPDATE, rank: 35, note: '오전 9시경 기록임. 업데이트 효과가 반영되기 전 수치로 추정함.[1]', dx: -10, dy: 24, anchor: 'end' },
+    { id: 'e', label: '11/2', t: day(11, 2), rank: 3, hit: true, note: '업데이트 나흘 뒤 기록임. 이번 조사에서 확인한 최고 순위임.[2]', dx: -15, dy: 6, anchor: 'end' },
+    { id: 'f', label: '11/5', t: PICKUP, rank: 5, hit: true, note: "과제 문구 기준임. '홍련: 신살' 픽업 시작일이며, 구글플레이 기준으로 가정함.", dx: 15, dy: 6, anchor: 'start' }
+  ];
+  const DOMS = { full: [day(9, 3), PICKUP], zoom: [day(10, 27), day(11, 6)] };
+  const M = { l: 44, r: 44, t: 28, b: 30 };
+  const svg = $('chart');
+  const readout = $('readout');
+  let dom = DOMS.full.slice(), mode = 'full', sel = data.length - 1;
+  let reveal = Infinity, playing = false, raf = 0, W = 740, H = 320;
+
+  const X = t => M.l + (t - dom[0]) / (dom[1] - dom[0]) * (W - M.l - M.r);
+  const Y = r => M.t + (r - 1) / 39 * (H - M.t - M.b);
+  const inDom = p => p.t >= DOMS[mode][0] && p.t <= DOMS[mode][1];
+  const shown = () => data.filter(inDom);
+
+  function draw() {
+    W = Math.max(280, Math.round(svg.parentElement.clientWidth));
+    H = W < 520 ? 290 : 340;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const line = list => list.map(p => `${X(p.t).toFixed(1)},${Y(p.rank).toFixed(1)}`).join(' ');
+    const clipW = Math.max(0, Math.min(reveal, W) - M.l + 14);
+    let s = `<defs><clipPath id="plotClip"><rect x="${M.l - 14}" y="0" width="${clipW}" height="${H}"/></clipPath></defs>`;
+
+    [1, 10, 20, 30, 40].forEach(r => {
+      s += `<line x1="${M.l - 8}" x2="${W - 12}" y1="${Y(r)}" y2="${Y(r)}" stroke="var(--rule)" stroke-width="1"/>`;
+      s += `<text class="axis" x="0" y="${Y(r) + 5}">${r}위</text>`;
+    });
+
+    const marker = (t, text, side) => {
+      const x = X(t);
+      if (x < M.l - 1 || x > W) return '';
+      return `<line x1="${x}" x2="${x}" y1="20" y2="${H - M.b}" stroke="var(--line2)" stroke-width="1" stroke-dasharray="4 4"/>` +
+        `<text class="note halo" x="${x + (side === 'end' ? -6 : 6)}" y="14" text-anchor="${side}">${text}</text>`;
+    };
+    const zoomed = dom[0] > day(10, 1);
+    s += marker(UPDATE, '4주년 업데이트', zoomed ? 'start' : 'end');
+    if (zoomed && W >= 520) s += marker(PICKUP, "'홍련: 신살' 픽업", 'end');
+
+    if (!playing) {
+      const x = X(data[sel].t);
+      s += `<line x1="${x}" x2="${x}" y1="${M.t}" y2="${H - M.b}" stroke="var(--fg)" stroke-width="1" opacity=".45"/>`;
+    }
+
+    s += '<g clip-path="url(#plotClip)">';
+    s += `<polyline fill="none" stroke="var(--line2)" stroke-width="2.5" stroke-linejoin="round" points="${line(data.filter(p => p.t <= UPDATE))}"/>`;
+    s += `<polyline fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round" points="${line(data.filter(p => p.t >= UPDATE))}"/>`;
+    s += '</g>';
+
+    shown().forEach(p => {
+      const x = X(p.t), y = Y(p.rank);
+      if (x > reveal + 1) return;
+      const color = p.t >= UPDATE ? 'var(--accent)' : 'var(--line2)';
+      if (!playing && p === data[sel]) s += `<circle cx="${x}" cy="${y}" r="10" fill="none" stroke="var(--fg)" stroke-width="1.5"/>`;
+      s += `<circle cx="${x}" cy="${y}" r="5.5" fill="${color}" stroke="var(--bg)" stroke-width="2"/>`;
+      s += `<text class="halo${p.hit ? ' hit' : ''}" x="${x + p.dx}" y="${y + p.dy}" text-anchor="${p.anchor}">${p.rank}위</text>`;
+    });
+
+    let last = Infinity;
+    shown().slice().reverse().forEach(p => {
+      const x = X(p.t);
+      if (last - x < 40) return;
+      last = x;
+      s += `<text class="axis" x="${x}" y="${H - 8}" text-anchor="middle">${p.label}</text>`;
+    });
+    svg.innerHTML = s;
+  }
+
+  function setReadout(i, rank = data[i].rank) {
+    const p = data[i], prev = data[i - 1];
+    $('roRank').textContent = `${rank}위`;
+    $('roRank').classList.toggle('hit', p.t > UPDATE);
+    $('roDate').textContent = p.label;
+    $('roNote').innerHTML = citeHTML(p.note);
+    if (prev) {
+      const n = prev.rank - p.rank;
+      $('roDelta').textContent = `이전 기록(${prev.label} ${prev.rank}위)보다 ${Math.abs(n)}계단 ${n > 0 ? '상승' : '하락'}`;
+    } else {
+      $('roDelta').textContent = '이번 기록의 첫 지점';
+    }
+    chips.forEach((c, k) => c.setAttribute('aria-pressed', String(k === i)));
+  }
+
+  function stopPlay() {
+    if (!playing) return;
+    cancelAnimationFrame(raf);
+    playing = false;
+    reveal = Infinity;
+    readout.setAttribute('aria-live', 'polite');
+    $('replay').textContent = '▶ 순위 변화 재생';
+  }
+
+  function select(i) {
+    if (i === sel && !playing) return;
+    stopPlay();
+    sel = i;
+    setReadout(i);
+    draw();
+  }
+
+  function play() {
+    if (playing) { stopPlay(); setReadout(sel); draw(); return; }
+    const pts = shown();
+    if (reduce) { sel = data.indexOf(pts[pts.length - 1]); setReadout(sel); draw(); return; }
+    cancelAnimationFrame(raf);
+    dom = DOMS[mode].slice();
+    playing = true;
+    readout.setAttribute('aria-live', 'off');
+    $('replay').textContent = '■ 재생 멈춤';
+    const SEG = 620, start = performance.now();
+    let seg = -1;
+    const tick = now => {
+      const pos = Math.max(0, now - start) / SEG, i = Math.floor(pos);
+      if (i >= pts.length - 1) {
+        sel = data.indexOf(pts[pts.length - 1]);
+        stopPlay();
+        setReadout(sel);
+        draw();
+        return;
+      }
+      const a = pts[i], b = pts[i + 1], f = pos - i, e = f * f * (3 - 2 * f);
+      if (i !== seg) { seg = i; setReadout(data.indexOf(b), a.rank); }
+      reveal = X(a.t) + (X(b.t) - X(a.t)) * e;
+      $('roRank').textContent = `${Math.round(a.rank + (b.rank - a.rank) * e)}위`;
+      draw();
+      raf = requestAnimationFrame(tick);
+    };
+    reveal = X(pts[0].t);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function setRange(next) {
+    if (next === mode) return;
+    if (playing) { stopPlay(); setReadout(sel); }
+    mode = next;
+    $('rangeFull').setAttribute('aria-pressed', String(next === 'full'));
+    $('rangeZoom').setAttribute('aria-pressed', String(next === 'zoom'));
+    if (!inDom(data[sel])) { sel = data.length - 1; setReadout(sel); }
+    const from = dom.slice(), to = DOMS[next];
+    if (reduce) { dom = to.slice(); draw(); return; }
+    const start = performance.now();
+    const tick = now => {
+      const f = Math.min(1, Math.max(0, now - start) / 480), e = 1 - Math.pow(1 - f, 3);
+      dom = [from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e];
+      draw();
+      if (f < 1) raf = requestAnimationFrame(tick);
+    };
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(tick);
+  }
+
+  const chips = data.map((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.id = `pt-${p.id}`;
+    b.innerHTML = `<span>${p.label}</span><b>${p.rank}위</b>`;
+    b.addEventListener('click', () => {
+      if (!inDom(p)) setRange('full');
+      select(i);
+    });
+    $('chips').append(b);
+    return b;
+  });
+
+  const nearest = e => {
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width;
+    let best = null, gap = Infinity;
+    shown().forEach(p => {
+      const g = Math.abs(X(p.t) - x);
+      if (g < gap) { gap = g; best = p; }
+    });
+    return data.indexOf(best);
+  };
+  svg.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && !playing) select(nearest(e)); });
+  svg.addEventListener('pointerdown', e => select(nearest(e)));
+
+  $('rangeFull').addEventListener('click', () => setRange('full'));
+  $('rangeZoom').addEventListener('click', () => setRange('zoom'));
+  $('replay').addEventListener('click', play);
+
+  setReadout(sel);
+  draw();
+  new ResizeObserver(() => draw()).observe(svg.parentElement);
+
+  /* 그래프가 처음 보일 때 한 번 재생함. 재생 전 화면에도 전체 그래프가 그려져 있음 */
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => {
+      if (es.some(x => x.isIntersecting)) { io.disconnect(); play(); }
+    }, { threshold: 0.5 });
+    io.observe(svg);
+  }
+})();
+</script>
+</body>
+</html>
