@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>게임 분석 · 소드X스태프:화산귀환 | 조민서</title>
+<meta name="description" content="라이트 RPG 소드X스태프와 네이버웹툰 화산귀환 콜라보를 순위·장르 구조·콜라보 구성으로 분석하고, 콜라보의 다음 단계를 제안합니다.">
+<link rel="icon" type="image/png" href="../index_files/minseo-checkpoint-logo_3d2f7d50.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* 게임 분석 페이지 전용. 색·글꼴·버튼은 style.css의 토큰을 그대로 쓴다. */
+  .ga { padding: 0 var(--gutter) 120px; max-width: 1180px; margin: 0 auto; }
+  .ga-sec { padding-top: 88px; scroll-margin-top: calc(var(--bar-h) + 12px); }
+  .ga-sec__head { display: grid; gap: 12px; margin-bottom: 32px; padding-bottom: 18px; border-bottom: 1px solid var(--ink); }
+  .ga-sec__no { font: 700 12px/1 var(--display); letter-spacing: 0.14em; color: var(--green-deep); }
+  .ga h2 { font: 700 clamp(24px, 3.4vw, 34px)/1.3 var(--body); letter-spacing: -0.02em; }
+  .ga h3 { font: 700 18px/1.45 var(--body); letter-spacing: -0.01em; margin-bottom: 8px; }
+  .ga p { color: var(--ink); }
+  .muted { color: var(--ink-faint) !important; }
+  .ga ol { list-style: none; margin: 0; padding: 0; }
+  .src { margin-top: 14px; font-size: 12.5px; line-height: 1.7; color: var(--ink-faint); }
+  .lbl { font: 700 11px/1 var(--display); letter-spacing: 0.14em; color: var(--green-deep); }
+
+  /* hero */
+  .ga-hero { padding: 72px 0 56px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 48px; align-items: end; }
+  .ga-hero h1 { margin-top: 18px; font: 900 clamp(38px, 6.6vw, 76px)/1.06 var(--body); letter-spacing: -0.035em; }
+  .ga-hero h1 em { font-style: normal; color: var(--green); }
+  .ga-hero__sub { margin-top: 18px; font-size: clamp(16px, 1.8vw, 19px); color: var(--ink-soft); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .chip { padding: 6px 12px; border: 1px solid var(--line); background: #fff; font-size: 13px; line-height: 1.4; }
+  .chip b { font-weight: 700; margin-right: 6px; color: var(--green-deep); }
+  .verdict { background: var(--ink); color: var(--paper); padding: 28px 28px 26px; }
+  .verdict .lbl { color: var(--green-tint); }
+  .verdict p { color: var(--paper); margin-top: 14px; font: 700 clamp(18px, 2vw, 22px)/1.55 var(--body); letter-spacing: -0.01em; }
+  .verdict p span { color: var(--green-tint); }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 30px; }
+  .toc a { font: 700 12px/1 var(--display); letter-spacing: 0.08em; padding: 6px 0; border-bottom: 2px solid transparent; transition: border-color 160ms var(--ease), color 160ms var(--ease); }
+  .toc a b { color: var(--green); margin-right: 6px; }
+
+  /* 01 stats */
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--ink); background: #fff; }
+  .stat { padding: 22px 20px; }
+  .stat + .stat { border-left: 1px solid var(--line); }
+  .stat__v { font: 700 clamp(34px, 4.4vw, 48px)/1 var(--display); letter-spacing: -0.03em; }
+  .stat__v small { font-size: 0.42em; margin-left: 4px; letter-spacing: 0; font-family: var(--body); }
+  .stat__k { margin-top: 12px; font-weight: 700; font-size: 14px; }
+  .stat__s { margin-top: 2px; font-size: 12px; color: var(--ink-faint); }
+  .rank { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; margin-top: 28px; align-items: center; }
+  .rank figure { background: #fff; border: 1px solid var(--line); padding: 18px 18px 10px; }
+  .rank svg { display: block; width: 100%; height: auto; }
+  .rank figcaption { font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+  .rank__note { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .rank__note img { width: 96px; border: 1px solid var(--line); }
+
+  /* timeline */
+  .tl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 8px; border-top: 2px solid var(--ink); }
+  .tl li { position: relative; padding: 22px 18px 0 0; }
+  .tl li::before { content: ""; position: absolute; top: -7px; left: 0; width: 12px; height: 12px; background: var(--paper); border: 2px solid var(--ink); }
+  .tl li.hot::before { background: var(--green); border-color: var(--green-deep); }
+  .tl time { font: 700 22px/1 var(--display); letter-spacing: -0.01em; }
+  .tl h3 { margin-top: 10px; font-size: 16px; }
+  .tl p { font-size: 14px; color: var(--ink-faint); }
+  .callout { margin-top: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start; padding: 20px 22px; border-left: 4px solid var(--green); background: #fff; }
+  .callout strong { font: 700 15px/1.5 var(--body); color: var(--green-deep); white-space: nowrap; }
+
+  /* game x ip */
+  .duo { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 18px; align-items: stretch; margin-top: 44px; }
+  .duo__x { align-self: center; font: 700 28px/1 var(--display); color: var(--green); }
+  .gcard { background: #fff; border: 1px solid var(--line); padding: 24px; }
+  .gbig { font: 700 clamp(28px, 3.4vw, 38px)/1.1 var(--display); letter-spacing: -0.02em; margin: 10px 0 4px; }
+  .gbig small { font: 500 14px/1 var(--body); margin-left: 6px; color: var(--ink-faint); letter-spacing: 0; }
+  .gcard ul { margin-top: 14px; display: grid; gap: 6px; }
+  .gcard li { position: relative; padding-left: 14px; font-size: 14.5px; }
+  .gcard li::before { content: ""; position: absolute; left: 0; top: 0.72em; width: 6px; height: 6px; background: var(--green); }
+
+  /* 02 info */
+  .info2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 36px; align-items: start; }
+  .facts2 { border-top: 1px solid var(--ink); }
+  .facts2 div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .facts2 dt { font-weight: 700; font-size: 14px; color: var(--green-deep); }
+  .facts2 dd { font-size: 15px; }
+  .facts2 dd small { display: block; color: var(--ink-faint); font-size: 13px; }
+  .shot { background: #fff; border: 1px solid var(--line); padding: 10px; }
+  .shot img { width: 100%; height: auto; }
+  .shot figcaption { padding: 10px 4px 2px; font-size: 13px; color: var(--ink-faint); }
+
+  /* 03 structures */
+  .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .struct { background: #fff; border: 1px solid var(--line); display: flex; flex-direction: column; }
+  .struct img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-bottom: 1px solid var(--line); }
+  .struct__b { padding: 18px 20px 22px; }
+  .struct__cap { font-size: 12.5px; color: var(--ink-faint); margin-bottom: 14px; }
+  .struct p { font-size: 14.5px; }
+  .loop { margin-top: 52px; }
+  .loop ol { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; counter-reset: s; }
+  .loop li { position: relative; padding: 18px 26px 18px 18px; background: #fff; border: 1px solid var(--ink); margin-right: -1px; }
+  .loop li.hot { background: var(--ink); color: var(--paper); }
+  .loop li.hot p { color: var(--green-tint); }
+  .loop li b { display: block; font: 700 12px/1 var(--display); letter-spacing: 0.12em; color: var(--green); margin-bottom: 10px; }
+  .loop li strong { font-size: 19px; }
+  .loop li p { font-size: 13.5px; color: var(--ink-faint); margin-top: 4px; }
+  .loop li:not(:last-child)::after { content: "→"; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); z-index: 1; width: 20px; height: 20px; display: grid; place-items: center; background: var(--green); color: #fff; font-size: 12px; }
+  .notes3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+  .notes3 > div { padding: 18px 20px; border-top: 3px solid var(--green); background: #fff; }
+  .notes3 p { font-size: 14.5px; }
+
+  /* 04 collab */
+  .collab { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .skills { margin-top: 16px; display: grid; gap: 8px; }
+  .skills div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 12px 14px; background: #fff; border: 1px solid var(--line); font-size: 14px; }
+  .skills b { font-weight: 700; }
+  .skills span { color: var(--ink-faint); text-align: right; }
+  .parts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+  .part { padding: 18px 16px; background: #fff; border: 1px solid var(--line); }
+  .part .lbl { display: block; margin-bottom: 10px; }
+  .part h3 { font-size: 16px; margin-bottom: 6px; }
+  .part p { font-size: 13.5px; color: var(--ink-faint); }
+  .eval { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 40px; }
+  .eval > div { padding: 22px 24px; background: #fff; border: 1px solid var(--line); }
+  .eval h3 { display: flex; align-items: center; gap: 10px; }
+  .eval h3 i { width: 22px; height: 22px; display: grid; place-items: center; font-style: normal; font: 700 13px/1 var(--display); color: #fff; background: var(--green); }
+  .eval .bad h3 i { background: var(--ink-faint); }
+  .eval ul { display: grid; gap: 8px; margin-top: 10px; }
+  .eval li { font-size: 14.5px; padding-left: 14px; position: relative; }
+  .eval li::before { content: "–"; position: absolute; left: 0; color: var(--ink-faint); }
+  .diag { margin-top: 18px; padding: 22px 24px; background: var(--ink); color: var(--paper); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: baseline; }
+  .diag .lbl { color: var(--green-tint); }
+  .diag p { color: var(--paper); font: 700 17px/1.6 var(--body); }
+
+  /* 05 conclusion */
+  .shift { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px; align-items: center; padding: 28px; background: #fff; border: 1px solid var(--ink); text-align: center; }
+  .shift strong { font: 900 clamp(20px, 2.6vw, 28px)/1.3 var(--body); letter-spacing: -0.02em; }
+  .shift strong.to { color: var(--green-deep); }
+  .shift span { font: 700 26px/1 var(--display); color: var(--green); }
+  .props { display: grid; gap: 22px; margin-top: 28px; }
+  .prop { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; padding: 26px 26px 24px; background: #fff; border: 1px solid var(--line); }
+  .prop__no { font: 700 44px/1 var(--display); color: var(--green); }
+  .prop__t { margin-top: 12px; font: 900 21px/1.4 var(--body); letter-spacing: -0.02em; }
+  .prop__lead { margin-top: 8px; font-size: 14px; color: var(--ink-faint); }
+  .steps { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 18px; }
+  .steps span { padding: 7px 12px; border: 1px solid var(--ink); font-size: 13.5px; font-weight: 700; background: var(--paper); }
+  .steps i { font-style: normal; color: var(--green); font-weight: 700; }
+  .prop dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; }
+  .prop dt { font: 700 12px/1 var(--display); letter-spacing: 0.08em; color: var(--green-deep); margin-bottom: 6px; }
+  .prop dd { font-size: 14.5px; }
+  .prop .kpi { grid-column: 1 / -1; padding-top: 12px; border-top: 1px dashed var(--line); }
+
+  /* 06 summary */
+  .sum { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--ink); }
+  .sum li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 18px 18px 18px 0; border-bottom: 1px solid var(--line); }
+  .sum b { font: 700 18px/1.4 var(--display); color: var(--green); }
+  .sum p { font-size: 15px; }
+  .refs { margin-top: 36px; padding: 22px 24px; background: #fff; border: 1px solid var(--line); }
+  .refs ul { margin-top: 12px; display: grid; gap: 6px; }
+  .refs li { font-size: 13.5px; color: var(--ink-faint); padding-left: 14px; position: relative; }
+  .refs li::before { content: ""; position: absolute; left: 0; top: 0.75em; width: 5px; height: 5px; background: var(--ink-faint); }
+  .credit { margin-top: 18px; font-size: 12.5px; color: var(--ink-faint); }
+
+  .ga-foot { margin-top: 80px; padding-top: 22px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font: 500 11px/1 var(--display); letter-spacing: 0.1em; color: var(--ink-faint); }
+  .ga-foot a { color: var(--ink); border-bottom: 1px solid var(--green); padding-bottom: 2px; }
+
+  @media (max-width: 960px) {
+    .ga-hero, .rank, .info2, .collab { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stat:nth-child(3) { border-left: 0; }
+    .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .three, .notes3 { grid-template-columns: minmax(0, 1fr); }
+    .parts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .prop { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    .tl { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 26px; border-top: 0; }
+    .tl li { border-top: 2px solid var(--ink); }
+  }
+  @media (max-width: 640px) {
+    .ga-sec { padding-top: 64px; }
+    .tl, .eval, .sum, .prop dl { grid-template-columns: minmax(0, 1fr); }
+    .loop ol { grid-template-columns: minmax(0, 1fr); }
+    .loop li { margin-right: 0; margin-bottom: -1px; }
+    .loop li:not(:last-child)::after { content: "↓"; right: auto; left: 18px; top: auto; bottom: -10px; transform: none; }
+    .duo { grid-template-columns: minmax(0, 1fr); }
+    .duo__x { justify-self: center; }
+    .shift { grid-template-columns: minmax(0, 1fr); }
+    .shift span { transform: rotate(90deg); }
+    .parts { grid-template-columns: minmax(0, 1fr); }
+    .callout, .diag { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .facts2 div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .verdict { padding: 22px; }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .toc a:hover { color: var(--green-deep); border-color: var(--green); }
+    .ga-foot a:hover { color: var(--green-deep); }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#ga-main">본문으로 건너뛰기</a>
+
+<header class="bar">
+  <a class="brand" href="../index.html"><i class="ck" aria-hidden="true"></i> <span class="brand__t">MINSEO JO</span></a>
+  <nav class="bar__nav" aria-label="주요 메뉴">
+    <a class="nl" href="../index.html#work">ALL PROJECT</a>
+    <a class="nl" href="../game-history.html">PLAY LOG</a>
+    <a class="nl is-on" href="../reports.html">GAME REPORT</a>
+  </nav>
+</header>
+
+<main class="ga" id="ga-main">
+
+  <section class="ga-hero" aria-labelledby="ga-title">
+    <div>
+      <p class="eyebrow"><i class="ck" aria-hidden="true"></i> GAME ANALYSIS · 2026.11</p>
+      <h1 id="ga-title">소드X스태프<br><em>:화산귀환</em></h1>
+      <p class="ga-hero__sub">라이트 RPG × 무협 웹툰 IP 콜라보 게임 분석</p>
+      <div class="chips">
+        <span class="chip"><b>제작·배급</b>볼트레이 게임즈</span>
+        <span class="chip"><b>국내 출시</b>2026.11.04</span>
+        <span class="chip"><b>콜라보</b>11.11 – 12.01</span>
+      </div>
+      <nav class="toc" aria-label="목차">
+        <a href="#s1"><b>01</b>개요</a>
+        <a href="#s2"><b>02</b>게임 기본 정보</a>
+        <a href="#s3"><b>03</b>장르 분석</a>
+        <a href="#s4"><b>04</b>콜라보 분석</a>
+        <a href="#s5"><b>05</b>결론</a>
+        <a href="#s6"><b>06</b>요약 · 출처</a>
+      </nav>
+    </div>
+    <aside class="verdict" aria-label="핵심 진단">
+      <span class="lbl">핵심 진단</span>
+      <p>지금의 콜라보는 ‘게임 위에 얹은 IP’.<br>넓게 들어왔지만 깊게 들어오지는 못했다. <span>다음 단계는 게임 구조 안의 IP다.</span></p>
+    </aside>
+  </section>
+
+  <!-- 01 -->
+  <section class="ga-sec" id="s1" aria-labelledby="s1-t">
+    <div class="ga-sec__head">
+      <span class="ga-sec__no">01 개요 · 왜 이 게임인가</span>
+      <h2 id="s1-t">출시 9일 만에 매출 차트 상위권</h2>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat__v">13<small>위</small></div><div class="stat__k">구글 플레이 매출</div><div class="stat__s">게임 · 11.13 07:03</div></div>
+      <div class="stat"><div class="stat__v">7<small>위</small></div><div class="stat__k">구글 플레이 무료</div><div class="stat__s">게임 · 11.13 07:03</div></div>
+      <div class="stat"><div class="stat__v">20<small>위</small></div><div class="stat__k">앱스토어 매출</div><div class="stat__s">게임 · 11.13 07:03</div></div>
+      <div class="stat"><div class="stat__v">1<small>위</small></div><div class="stat__k">앱스토어 인기</div><div class="stat__s">출시 직후 기록 · 보도자료</div></div>
+    </div>
+
+    <div class="rank">
+      <figure>
+        <svg viewBox="0 0 520 210" role="img" aria-labelledby="rank-t">
+          <title id="rank-t">구글 플레이 매출 순위: 출시 후 20위에서 콜라보 오픈(11.11) 뒤 11월 13일 13위로 상승</title>
+          <g font-family="Space Grotesk, Noto Sans KR, sans-serif" font-size="12" fill="#4f5a55">
+            <text x="0" y="44">10위</text><text x="0" y="104">15위</text><text x="0" y="164">20위</text>
+          </g>
+          <g stroke="rgba(9,20,19,0.12)"><line x1="44" y1="40" x2="510" y2="40"/><line x1="44" y1="100" x2="510" y2="100"/><line x1="44" y1="160" x2="510" y2="160"/></g>
+          <line x1="350" y1="22" x2="350" y2="182" stroke="#408a71" stroke-width="2" stroke-dasharray="4 4"/>
+          <text x="356" y="30" font-family="Noto Sans KR, sans-serif" font-size="12" font-weight="700" fill="#285a48">11.11 콜라보 오픈</text>
+          <polyline points="80,160 350,160 470,76" fill="none" stroke="#091413" stroke-width="3"/>
+          <rect x="74" y="154" width="12" height="12" fill="#f2f2f2" stroke="#091413" stroke-width="2"/>
+          <rect x="464" y="70" width="12" height="12" fill="#408a71" stroke="#285a48" stroke-width="2"/>
+          <g font-family="Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="#091413">
+            <text x="70" y="196">출시 후 · 20위</text>
+            <text x="420" y="62">11.13 · 13위</text>
+          </g>
+        </svg>
+        <figcaption>구글 플레이 매출 순위 흐름 (중간 구간은 표시하지 않음)</figcaption>
+      </figure>
+      <div class="rank__note">
+        <img src="../assets/analysis/sxs-icon.jpg" alt="‘콜라보 확정!’ 문구가 들어간 소드X스태프 앱 아이콘" width="96" height="96" loading="lazy">
+        <div>
+          <h3>콜라보 오픈 후 7계단 상승</h3>
+          <p>스토어 표기명도 ‘소드 x 스태프: 화산귀환 콜라보’로 바꿨고, 앱 아이콘에도 ‘콜라보 확정!’을 넣었다.</p>
+        </div>
+      </div>
+    </div>
+    <p class="src">출처: 모바일인덱스 실시간 마켓별 순위(2026.11.13 07:03 기준), 게임메카·더게임스데일리(2026.11.11~12). 순위는 수시로 바뀌므로 기준 시각을 함께 표기했다.</p>
+
+    <h3 style="margin-top:56px">출시와 콜라보를 한 묶음으로 설계한 런칭</h3>
+    <ol class="tl">
+      <li><time datetime="2026-09-22">09.22</time><h3>국내 사전예약 시작</h3><p>‘글로벌 1,000만 유저’ 실적을 앞세운 홍보, 한국 한정 무기 보상</p></li>
+      <li><time datetime="2026-10-28">10.28</time><h3>화산귀환 콜라보 발표</h3><p>사전 커마 이벤트 ‘쏘~미더 커마 Plus’, 총 1,000만 원 규모 경품</p></li>
+      <li><time datetime="2026-11-04">11.04</time><h3>국내 정식 출시</h3><p>앱스토어 인기 1위, 구글 플레이 매출 20위 진입</p></li>
+      <li class="hot"><time datetime="2026-11-11">11.11</time><h3>콜라보 정식 오픈</h3><p>12월 1일까지 3주간, 화산파 5인이 동료로 등장</p></li>
+    </ol>
+    <div class="callout">
+      <strong>2단 점화</strong>
+      <p>출시 1주 뒤 콜라보를 여는 구조. 신작 효과가 꺾이기 쉬운 시점에 IP 이슈로 유입과 매출을 다시 끌어올렸다는 점이 이 게임을 분석할 첫 번째 이유다.</p>
+    </div>
+    <p class="src">출처: 경향게임스·게임조선(09.22), 루리웹·게임메카(10.28), 게임톡·게임메카(11.11~12)</p>
+
+    <div class="duo">
+      <div class="gcard">
+        <span class="lbl">GAME · 소드X스태프</span>
+        <p class="gbig">1,000만<small>글로벌 누적 이용자</small></p>
+        <ul>
+          <li>중국 iOS 매출 순위 최고 11위</li>
+          <li>일본·미국 앱스토어·구글 무료 인기 1위</li>
+          <li>글로벌 서버 출시 11일 매출 약 520만 달러(추정)</li>
+        </ul>
+      </div>
+      <span class="duo__x" aria-hidden="true">×</span>
+      <div class="gcard">
+        <span class="lbl">IP · 네이버웹툰 화산귀환</span>
+        <p class="gbig">21억 회<small>글로벌 조회 수</small></p>
+        <ul>
+          <li>몰락한 화산파의 재건을 그린 무협 회귀물, 3부 연재 중</li>
+          <li>2026년 4월 3부 연재 재개, 국내·대만 옥외광고</li>
+          <li>세븐나이츠 키우기·블소 레볼루션 콜라보 이력 — 게임 콜라보 흥행이 검증된 IP</li>
+        </ul>
+      </div>
+    </div>
+    <p class="src">출처: 경향게임스(09.22), DianDian/TapTap Global(2026.06), 디지털데일리·네이버(2026.04.15), 웹툰가이드</p>
+  </section>
+
+  <!-- 02 -->
+  <section class="ga-sec" id="s2" aria-labelledby="s2-t">
+    <div class="ga-sec__head">
+      <span class="ga-sec__no">02 게임 기본 정보</span>
+      <h2 id="s2-t">한눈에 보는 소드X스태프:화산귀환</h2>
+    </div>
+    <div class="info2">
+      <dl class="facts2">
+        <div><dt>제작·배급</dt><dd>볼트레이 게임즈 (BOLTRAY GAMES)</dd></div>
+        <div><dt>장르</dt><dd>어드벤처 — 선형 진행 · 미해결 시 체류 · 아이템<small>스토어·보도자료 표기: 라이트 RPG / 방치형 RPG</small></dd></div>
+        <div><dt>출시</dt><dd>2026.11.04 국내 정식 출시 · Android / iOS</dd></div>
+        <div><dt>세계관</dt><dd>검과 마법의 이세계 ‘칸스틴’ · 2D 일러스트, SD 캐릭터</dd></div>
+        <div><dt>핵심 시스템</dt><dd>전사·법사 기반 전직(레벨·숙련도 유지), 수백 가지 스킬 조합, 홈/저택 방치 성장, 커스터마이징</dd></div>
+      </dl>
+      <figure class="shot">
+        <img src="../assets/analysis/sxs-mansion.jpg" alt="침대에서 자는 캐릭터가 보이는 저택 화면" width="1000" height="820" loading="lazy">
+        <figcaption>저택: 캐릭터가 자는 동안에도 성장이 쌓이는 방치 시스템</figcaption>
+      </figure>
+    </div>
+    <p class="src">출처: 경향게임스·게임조선(2026.09.22), 게임메카(2026.11.12)</p>
+  </section>
+
+  <!-- 03 -->
+  <section class="ga-sec" id="s3" aria-labelledby="s3-t">
+    <div class="ga-sec__head">
+      <span class="ga-sec__no">03 장르 분석</span>
+      <h2 id="s3-t">어드벤처로 읽는 세 가지 구조</h2>
+    </div>
+    <div class="three">
+      <article class="struct">
+        <img src="../assets/analysis/sxs-linear.jpg" alt="숲의 나라 14 지역, 탐색 0/100 표시가 있는 필드 화면" width="1000" height="549" loading="lazy">
+        <div class="struct__b">
+          <p class="struct__cap">‘숲의 나라 14’ 탐색 0/100 — 번호 붙은 지역을 순서대로</p>
+          <span class="lbl">STRUCTURE 1</span>
+          <h3 style="margin-top:8px">선형적 진행</h3>
+          <p>지역을 정해진 순서로 연다. 앞 지역을 끝내야 다음 지역이 열리고, 이야기와 난이도도 같은 순서로 오른다.</p>
+        </div>
+      </article>
+      <article class="struct">
+        <img src="../assets/analysis/sxs-boss.jpg" alt="20턴 제한 보스전 화면" width="1000" height="709" loading="lazy">
+        <div class="struct__b">
+          <p class="struct__cap">20턴 제한 보스전 · 추천 전투력 46.5K vs 내 42.2K</p>
+          <span class="lbl">STRUCTURE 2</span>
+          <h3 style="margin-top:8px">미해결 시 공간에 머묾</h3>
+          <p>턴 안에 보스를 못 잡거나 추천 전투력에 못 미치면 그 지역에 남는다. 방치 성장·전직·스킬 재조합으로 다시 도전한다.</p>
+        </div>
+      </article>
+      <article class="struct">
+        <img src="../assets/analysis/sxs-reward.jpg" alt="단조석, 연마석, 투쟁의 정수 등이 표시된 보상 획득 화면" width="1000" height="667" loading="lazy">
+        <div class="struct__b">
+          <p class="struct__cap">보상 획득 — 단조석·연마석·투쟁의 정수 등 성장 재료</p>
+          <span class="lbl">STRUCTURE 3</span>
+          <h3 style="margin-top:8px">아이템의 역할</h3>
+          <p>전투 보상으로 받은 재료가 장비·스킬을 키워 막힌 구간을 여는 열쇠가 된다. 콜라보에선 매화검이 이 자리를 맡는다.</p>
+        </div>
+      </article>
+    </div>
+    <p class="src">장르 구조는 내 분석 기준 · 시스템 정보는 보도자료 참고</p>
+
+    <div class="loop">
+      <h3>핵심 루프 — 막힘이 다음 준비를 부르는 구조</h3>
+      <ol>
+        <li><b>STEP 1</b><strong>탐험</strong><p>새 지역 진입, 이야기 진행</p></li>
+        <li class="hot"><b>STEP 2</b><strong>막힘</strong><p>전투(퍼즐) 미해결, 공간에 머묾</p></li>
+        <li><b>STEP 3</b><strong>준비</strong><p>방치 성장, 아이템, 하우징</p></li>
+        <li><b>STEP 4</b><strong>돌파</strong><p>전직·스킬 재조합 후 재도전</p></li>
+      </ol>
+      <div class="notes3">
+        <div><h3>과금·리텐션의 접점</h3><p>2단계 ‘막힘’에서 성장 재화·동료·장비 수요가 생긴다. 콜라보 동료와 아이템이 들어가는 자리도 바로 여기다.</p></div>
+        <div><h3>막힘이 실험이 되는 이유</h3><p>전직해도 레벨·숙련도가 유지되어 다른 빌드로 시도하는 비용이 낮다. 좌절보다 ‘다른 수를 써보는’ 재미로 느껴진다.</p></div>
+        <div><h3>머무는 시간의 가치</h3><p>공간에 머무는 동안에도 홈/저택 방치 성장이 이어져, 체류 자체가 손해가 아니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section class="ga-sec" id="s4" aria-labelledby="s4-t">
+    <div class="ga-sec__head">
+      <span class="ga-sec__no">04 콜라보 분석</span>
+      <h2 id="s4-t">화산파가 칸스틴에 들어온 방식</h2>
+    </div>
+    <div class="collab">
+      <figure class="shot">
+        <img src="../assets/analysis/sxs-collab.jpg" alt="화산파 동료 청명의 스킬 소개 화면" width="1300" height="731" loading="lazy">
+        <figcaption>콜라보 동료 청명 소개 화면</figcaption>
+      </figure>
+      <div>
+        <span class="lbl">청명의 스킬 — 원작 무공을 전투 규칙으로</span>
+        <div class="skills">
+          <div><b>극성칠매검·매화류</b><span>전방 5×7칸 전체 공격</span></div>
+          <div><b>극성칠매검·매화벽</b><span>전방 3×4칸 전체 공격</span></div>
+          <div><b>화산신룡 (비법)</b><span>체력 20% 잃을 때마다 쿨타임 −1턴</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="parts">
+      <div class="part"><span class="lbl">동료 5인</span><h3>막힘 돌파 전력</h3><p>청명·백천·유이설·윤종·조걸. 윤종은 7일 출석 시 무료</p></div>
+      <div class="part"><span class="lbl">아이템·스킬</span><h3>아이템의 역할</h3><p>매화검·암향백매화·육합공 심법 등 원작 무공 반영</p></div>
+      <div class="part"><span class="lbl">한정 코스튬</span><h3>수집·과시</h3><p>청명·백천·유이설의 무복과 헤어스타일 재현</p></div>
+      <div class="part"><span class="lbl">하우징</span><h3>머무는 공간</h3><p>매화나무·화산 봉우리 스킨, 화산파 동료가 무작위 방문</p></div>
+      <div class="part"><span class="lbl">이벤트</span><h3>짧은 서사 체험</h3><p>화산파 스토리 · 퍼즐 · 3매치 · 이모티콘 16종 · 1,000만 원 규모 팬아트 이벤트</p></div>
+    </div>
+    <p class="src">출처: 게임톡(2026.11.12), 루리웹(2026.10.28), 콜라보 파트너 소개 이미지 · 기간 2026.11.11 – 12.01</p>
+
+    <div class="eval">
+      <div class="good">
+        <h3><i aria-hidden="true">○</i>잘된 점</h3>
+        <ul>
+          <li>출시 1주 차 콜라보로 구글 매출 20위 → 13위 반등</li>
+          <li>무료 동료·출석 보상으로 웹툰 팬의 첫 진입이 쉬움</li>
+          <li>원작 무공을 스킬·아이템으로 옮겨 ‘써보는’ IP 경험</li>
+          <li>하우징·코스튬까지 넓혀 전투 밖 체류도 콜라보화</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3><i aria-hidden="true">△</i>아쉬운 점</h3>
+        <ul>
+          <li>약 3주 한정이라 종료 후 남는 것이 적음</li>
+          <li>화산파 이야기가 본편이 아닌 이벤트 스토리·미니 퍼즐에 머묾</li>
+          <li>판타지 SD와 정통 무협 톤을 잇는 세계관 장치가 약함</li>
+          <li>웹툰과 게임 사이 양방향 유입 장치가 보이지 않음</li>
+        </ul>
+      </div>
+    </div>
+    <div class="diag">
+      <span class="lbl">핵심 진단</span>
+      <p>지금의 콜라보는 ‘게임 위에 얹은 IP’. 넓게 들어왔지만 깊게 들어오지는 못했다.</p>
+    </div>
+    <p class="src">평가는 내 분석 · 근거 수치는 01·04 섹션 출처 참고</p>
+  </section>
+
+  <!-- 05 -->
+  <section class="ga-sec" id="s5" aria-labelledby="s5-t">
+    <div class="ga-sec__head">
+      <span class="ga-sec__no">05 결론 · 콜라보의 나아갈 길</span>
+      <h2 id="s5-t">화산파가 게임의 뼈대 안에 자리 잡게 한다</h2>
+    </div>
+    <div class="shift">
+      <strong>게임 위에 얹은 IP</strong>
+      <span aria-hidden="true">→</span>
+      <strong class="to">게임 구조 안의 IP</strong>
+    </div>
+    <p style="margin-top:18px">지금의 콜라보는 3주간 ‘얹혀 있다가’ 떠난다. 다음 단계는 화산파가 게임의 뼈대인 선형 진행, 아이템, 유입 경로 안에 자리 잡는 것이다.</p>
+
+    <div class="props">
+      <article class="prop">
+        <div>
+          <div class="prop__no">01</div>
+          <p class="prop__t">화산파 ‘선형 챕터’로<br>본편에 편입</p>
+          <p class="prop__lead">이야기를 걸어서 지나가게. 이벤트 미니게임에 머문 원작 이야기를 선형 어드벤처 구조 안으로 옮긴다.</p>
+        </div>
+        <div>
+          <div class="steps" aria-label="진행 순서"><span>화산 입문</span><i>→</i><span>수련 관문</span><i>→</i><span>매화검법 퍼즐</span><i>→</i><span>화산 재건</span></div>
+          <dl>
+            <div><dt>무엇을</dt><dd>칸스틴에 ‘화산’ 지역 챕터 추가. 몰락한 문파의 재건이라는 원작 줄기를 지역 순서대로 따라간다.</dd></div>
+            <div><dt>어떻게</dt><dd>구간마다 원작 명장면 기반 관문 전투(퍼즐). 못 풀면 화산 수련장에 머물며 무공을 익혀 재도전.</dd></div>
+            <div><dt>기대 효과</dt><dd>웹툰 팬은 이야기를 플레이하고, 기존 유저는 새 지역을 얻는다. 종료 후 상설화도 가능.</dd></div>
+            <div class="kpi"><dt>성과 지표</dt><dd>챕터 완료율 · 콜라보 기간 신규 유저의 7일 잔존율</dd></div>
+          </dl>
+        </div>
+      </article>
+      <article class="prop">
+        <div>
+          <div class="prop__no">02</div>
+          <p class="prop__t">아이템 중심으로<br>콜라보 수명 연장</p>
+          <p class="prop__lead">매화검은 지지 않는다. 3주 한정 이벤트가 끝나도 콜라보 아이템이 빌드 안에서 계속 쓰이게 만든다.</p>
+        </div>
+        <div>
+          <div class="steps" aria-label="진행 순서"><span>콜라보 획득</span><i>→</i><span>화산 검법 빌드</span><i>→</i><span>강화·각성</span><i>→</i><span>시즌 복각</span></div>
+          <dl>
+            <div><dt>무엇을</dt><dd>매화검·암향백매화·육합공 심법을 묶어 ‘화산 검법’ 계열 스킬 빌드로 정식 편입.</dd></div>
+            <div><dt>어떻게</dt><dd>전직·스킬 조합 시스템과 연결하고, 화산귀환 3부 연재 흐름에 맞춰 시즌제 복각.</dd></div>
+            <div><dt>기대 효과</dt><dd>‘막힘 → 준비 → 돌파’ 루프에서 계속 쓰이며 일회성 매출이 반복 매출로 바뀐다.</dd></div>
+            <div class="kpi"><dt>성과 지표</dt><dd>콜라보 종료 후 화산 빌드 사용률 · 복각 시즌 매출 순위 변화</dd></div>
+          </dl>
+        </div>
+      </article>
+      <article class="prop">
+        <div>
+          <div class="prop__no">03</div>
+          <p class="prop__t">웹툰–게임 양방향 순환과<br>글로벌 확장</p>
+          <p class="prop__lead">독자는 유저로, 유저는 독자로. 21억 회 조회 IP의 팬층과 글로벌 1,000만 유저 기반이 서로를 키우게 한다.</p>
+        </div>
+        <div>
+          <div class="steps" aria-label="순환 구조"><span>웹툰 회차</span><i>⇄</i><span>게임 보상·스토리</span><i>⇄</i><span>커마·팬아트 UGC</span><i>⇄</i><span>해외 서버</span></div>
+          <dl>
+            <div><dt>무엇을</dt><dd>네이버웹툰 회차와 게임 보상 연동, 게임 속 화산파 스토리에서 원작 회차로 이어지는 링크.</dd></div>
+            <div><dt>어떻게</dt><dd>사전 커마·팬아트 UGC를 ‘화산파 커마 콘테스트’로 잇고, 화산귀환 인기가 높은 대만 등 해외 서버로 확대.</dd></div>
+            <div><dt>기대 효과</dt><dd>국내 한정 이벤트를 넘어 IP 사업으로 확장. 웹툰 쪽에도 신규 독자 유입.</dd></div>
+            <div class="kpi"><dt>성과 지표</dt><dd>웹툰 경유 유입 수 · UGC 참여 수 · 해외 서버 콜라보 기간 순위</dd></div>
+          </dl>
+        </div>
+      </article>
+    </div>
+    <p class="src">제안은 내 분석 · 근거: 네이버 보도자료(2026.04.15, 대만 시먼딩 옥외광고), 루리웹(2026.10.28)</p>
+  </section>
+
+  <!-- 06 -->
+  <section class="ga-sec" id="s6" aria-labelledby="s6-t">
+    <div class="ga-sec__head">
+      <span class="ga-sec__no">06 요약 · 출처</span>
+      <h2 id="s6-t">한 장 정리</h2>
+    </div>
+    <ol class="sum">
+      <li><b>01</b><p><strong>왜</strong> — 출시 9일 만에 구글 매출 13위. 출시 1주 뒤 콜라보로 다시 끌어올린 ‘2단 점화’ 런칭.</p></li>
+      <li><b>02</b><p><strong>무엇</strong> — 겉은 방치형 RPG, 뼈대는 ‘막힘 → 준비 → 돌파’를 반복하는 선형 어드벤처.</p></li>
+      <li><b>03</b><p><strong>콜라보</strong> — 동료·아이템·코스튬·하우징까지 넓게 들어왔지만, 3주 한정의 ‘얹은 IP’.</p></li>
+      <li><b>04</b><p><strong>나아갈 길</strong> — 선형 챕터 편입 · 아이템 중심 장기화 · 웹툰–게임 IP 순환.</p></li>
+    </ol>
+    <div class="refs">
+      <span class="lbl">참고 자료</span>
+      <ul>
+        <li>모바일인덱스 실시간 마켓별 순위 (2026.11.13 07:03)</li>
+        <li>게임메카 · 게임톡 · 더게임스데일리 · 게임뷰 — 콜라보 오픈 (2026.11.11~12)</li>
+        <li>루리웹 · 게임메카 — 콜라보 발표, 출시일 확정 (2026.10.28)</li>
+        <li>인벤글로벌 — 국내 정식 출시 (2026.11.04)</li>
+        <li>경향게임스 · 게임조선 — 국내 사전예약, 글로벌 실적 (2026.09.22)</li>
+        <li>DianDian / TapTap Global — 글로벌 서버 매출 추정 (2026.06)</li>
+        <li>디지털데일리 · 네이버 — 화산귀환 3부, 글로벌 조회 21억 회 (2026.04.15)</li>
+        <li>웹툰가이드 — 세븐나이츠 키우기·블소 레볼루션 콜라보 (2025)</li>
+      </ul>
+    </div>
+    <p class="credit">게임 화면과 콜라보 이미지의 저작권은 볼트레이 게임즈에 있습니다. 화산귀환: Original Comics from NAVER WEBTOON ©LICO ©Biga. 분석 목적으로만 사용했습니다.</p>
+  </section>
+
+  <footer class="ga-foot">
+    <span>MINSEO JO · GAME REPORT</span>
+    <a href="../reports.html">← 보고서 목록</a>
+    <a href="../game-history.html">PLAY LOG &#8599;</a>
+    <span>&copy; 2026</span>
+  </footer>
+</main>
+
+</body>
+</html>

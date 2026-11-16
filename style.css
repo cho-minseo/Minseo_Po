@@ -240,7 +240,8 @@ em { font-style: normal; position: relative; z-index: 0; }
   .hide-sm { display: none; }
   .strip { font-size: 11px; }
   .brand__t { display: none; }
-  .nl { font-size: 11px; letter-spacing: 0.08em; }
+  .bar__nav { gap: 10px; }
+  .nl { font-size: 10px; letter-spacing: 0.06em; white-space: nowrap; }
   .stage { display: none; }
   .scroll { display: none; }
 }
